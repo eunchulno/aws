@@ -1,0 +1,27 @@
+var aws = require('aws-sdk')
+var express = require('express')
+var multer = require('multer')
+var multerS3 = require('multer-s3')
+
+var app = express()
+aws.config.region = 'ap-northeast-2';
+var s3 = new aws.S3();
+
+var upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'eunchul',
+    acl: 'public-read',
+    key: function (req, file, cb) {
+      //console.log(file);
+      cb(null, Date.now().toString()+"."+file.originalname.split(".")[1]);
+    }
+  })
+})
+
+app.post('/upload', upload.single('photo'), function(req, res, next) {
+  res.send('success');
+})
+app.listen(3000, function() {
+    console.log('server is listening 3000');
+});

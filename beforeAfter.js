@@ -12,10 +12,8 @@ db.products.productRecommendation = async function(query){
       }
       result.push({product_id:productInterest.product_id,matchRate:matchRate});
     }
-    result.sort(function(a,b){
-      return a.matchRate > b.matchRate ? -1 : a.matchRate < b.matchRate ? 1 : 0;
-    });
-    var id = result.map(product=>{return product.product_id});
+    var id = result.sort(function(a,b){return a.matchRate > b.matchRate ? -1 : a.matchRate < b.matchRate ? 1 : 0;})
+                   .map(product=>{return product.product_id});
     var user = await db.events.findOne({where:query});
     var data = await db.products.findAll({where:{product_id:id},order: db.sequelize.fn('field',db.sequelize.col('products.product_id'),id),limit:10,
               include:[{model:db.image_urls,attributes:['image_url']},
